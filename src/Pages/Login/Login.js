@@ -13,10 +13,30 @@ const Login = () => {
     const email = form.email.value;
     const password = form.password.value;
     let from = location.state?.from?.pathname || "/";
+
     loginUser(email, password)
       .then((result) => {
-        setUser(result.user);
-        navigate(from, { replace: true });
+        const user = result.user;
+        setUser(user);
+        const currentUser = {
+          email: user.email,
+        };
+        console.log(currentUser);
+
+        fetch("http://localhost:5000/jwt", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify(currentUser),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            const token = data.token;
+            localStorage.setItem("token", token);
+          });
+
+        // navigate(from, { replace: true });
       })
       .catch((err) => console.log(err));
   };
